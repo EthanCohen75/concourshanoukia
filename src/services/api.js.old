@@ -1,0 +1,224 @@
+/**
+ * Service API pour communiquer avec le backend
+ */
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
+const api = {
+  // ========== HANOUKIOT ==========
+
+  /**
+   * Récupérer toutes les hanoukiot
+   */
+  getAllHanoukiot: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/hanoukiot`);
+      if (!response.ok) throw new Error('Erreur lors de la récupération des hanoukiot');
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Ajouter une nouvelle hanoukia (admin)
+   */
+  addHanoukia: async (images, adminCode) => {
+    try {
+      const formData = new FormData();
+      formData.append('adminCode', adminCode);
+
+      // Ajouter toutes les images
+      images.forEach(image => {
+        // Si l'image est un objet File
+        if (image instanceof File) {
+          formData.append('images', image);
+        }
+      });
+
+      const response = await fetch(`${API_BASE_URL}/hanoukiot`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Erreur lors de l\'ajout');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Réorganiser les hanoukiot (admin)
+   */
+  reorderHanoukiot: async (hanoukiot, adminCode) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/hanoukiot/reorder`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ hanoukiot, adminCode })
+      });
+
+      if (!response.ok) throw new Error('Erreur lors de la réorganisation');
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Supprimer une hanoukia (admin)
+   */
+  deleteHanoukia: async (id, adminCode) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/hanoukiot/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ adminCode })
+      });
+
+      if (!response.ok) throw new Error('Erreur lors de la suppression');
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Récupérer les statistiques (admin)
+   */
+  getStatistics: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/hanoukiot/statistics`);
+      if (!response.ok) throw new Error('Erreur lors de la récupération des statistiques');
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  },
+
+  // ========== VOTES ==========
+
+  /**
+   * Soumettre un vote
+   */
+  submitVote: async (hanoukiaId, voterId, rating) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/votes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ hanoukiaId, voterId, rating })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Erreur lors du vote');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Récupérer le vote d'un utilisateur pour une hanoukia
+   */
+  getUserVote: async (hanoukiaId, voterId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/votes/${hanoukiaId}/${voterId}`);
+      if (!response.ok) throw new Error('Erreur lors de la récupération du vote');
+      const data = await response.json();
+      return data.rating;
+    } catch (error) {
+      console.error('API Error:', error);
+      return null;
+    }
+  },
+
+  /**
+   * Récupérer tous les votes d'un utilisateur
+   */
+  getUserVotes: async (voterId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/votes/user/${voterId}`);
+      if (!response.ok) throw new Error('Erreur lors de la récupération des votes');
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      return [];
+    }
+  },
+
+  // ========== ADMIN ==========
+
+  /**
+   * Vérifier le code admin
+   */
+  verifyAdminCode: async (code) => {
+    try {
+      console.log('[API] Envoi de la requête de vérification du code admin');
+      const response = await fetch(`${API_BASE_URL}/admin/verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ code })
+      });
+
+      console.log('[API] Statut de la réponse:', response.status, response.statusText);
+      if (!response.ok) throw new Error('Erreur de vérification');
+      const data = await response.json();
+      console.log('[API] Données reçues:', data);
+      console.log('[API] Retour de data.valid:', data.valid);
+      return data.valid;
+    } catch (error) {
+      console.error('[API] Erreur lors de la vérification:', error);
+      return false;
+    }
+  },
+
+  // ========== UTILITAIRES ==========
+
+  /**
+   * Vérifier la santé de l'API
+   */
+  healthCheck: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/health`);
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
+  },
+
+  /**
+   * Obtenir l'URL complète d'une image
+   */
+  getImageUrl: (imagePath) => {
+    if (!imagePath) return null;
+    // Si c'est déjà une URL complète
+    if (imagePath.startsWith('http')) return imagePath;
+    // Sinon, construire l'URL
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    return `${baseUrl}${imagePath}`;
+  }
+};
+
+export default api;

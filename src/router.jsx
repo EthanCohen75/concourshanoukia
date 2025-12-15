@@ -5,26 +5,28 @@ import HanoukiaGallery from './components/visitor/HanoukiaGallery';
 import AdminAuth from './components/admin/AdminAuth';
 import AdminDashboard from './components/admin/AdminDashboard';
 
+const ProtectedAdminDashboard = () => (
+  <ProtectedRoute>
+    <AdminDashboard />
+  </ProtectedRoute>
+);
+
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Layout />,
+    Component: Layout,
     children: [
       {
         index: true,
-        element: <HanoukiaGallery />
+        Component: HanoukiaGallery
       },
       {
         path: 'admin',
-        element: <AdminAuth />
+        Component: AdminAuth
       },
       {
         path: 'admin/dashboard',
-        element: (
-          <ProtectedRoute>
-            <AdminDashboard />
-          </ProtectedRoute>
-        )
+        Component: ProtectedAdminDashboard
       }
     ]
   }

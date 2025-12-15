@@ -22,7 +22,8 @@ const useStatistics = () => {
       }
     };
     loadStats();
-  }, [getStatistics]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const sortedStats = useMemo(() => {
     const sorted = [...stats].sort((a, b) => {

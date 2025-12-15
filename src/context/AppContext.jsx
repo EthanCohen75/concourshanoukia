@@ -1,16 +1,14 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 
-export const AppContext = createContext();
+export const AppContext = createContext(null);
 
 export const AppProvider = ({ children }) => {
   const [hanoukiot, setHanoukiot] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => { loadHanoukiot(); }, []);
-
-  const loadHanoukiot = async () => {
+  const loadHanoukiot = useCallback(async () => {
     try {
       setLoading(true);
       const data = await api.getAllHanoukiot();
@@ -22,7 +20,9 @@ export const AppProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => { loadHanoukiot(); }, [loadHanoukiot]);
 
   const addHanoukia = useCallback(async (imageFiles, adminCode) => {
     try {
@@ -33,7 +33,7 @@ export const AppProvider = ({ children }) => {
       console.error('Error adding hanoukia:', error);
       throw error;
     }
-  }, []);
+  }, [loadHanoukiot]);
 
   const deleteHanoukia = useCallback(async (id, adminCode) => {
     try {
@@ -43,7 +43,7 @@ export const AppProvider = ({ children }) => {
       console.error('Error deleting hanoukia:', error);
       throw error;
     }
-  }, []);
+  }, [loadHanoukiot]);
 
   const reorderHanoukiot = useCallback(async (reorderedList, adminCode) => {
     try {

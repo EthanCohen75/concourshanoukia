@@ -1,5 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
-import { AdminContext } from '../../context/AdminContext';
+import { useState, useEffect } from 'react';
 import MediaCarousel from './MediaCarousel';
 import RatingInterface from './RatingInterface';
 import useHanoukiot from '../../hooks/useHanoukiot';
@@ -7,7 +6,6 @@ import useVoter from '../../hooks/useVoter';
 
 const HanoukiaCard = ({ hanoukia }) => {
   const { submitVote, getUserVote, deleteVote } = useHanoukiot();
-  const { isAuthenticated } = useContext(AdminContext);
   const voterId = useVoter();
   const [isVoting, setIsVoting] = useState(false);
   const [currentRating, setCurrentRating] = useState(null);
@@ -77,14 +75,6 @@ const HanoukiaCard = ({ hanoukia }) => {
         />
         {isVoting && <span className="voting-status">Enregistrement...</span>}
       </div>
-
-      {isAuthenticated && (
-        <div className="hanoukia-footer">
-          <span className="vote-count">
-            {hanoukia.votes.length} {hanoukia.votes.length === 1 ? 'vote' : 'votes'}
-          </span>
-        </div>
-      )}
     </div>
   );
 };

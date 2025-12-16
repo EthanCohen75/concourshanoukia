@@ -23,6 +23,7 @@ const api = {
   submitVote: (hanoukiaId, voterId, rating) => votesApi.submit(hanoukiaId, voterId, rating),
   getUserVote: (hanoukiaId, voterId) => votesApi.getUserVote(hanoukiaId, voterId),
   getUserVotes: (voterId) => votesApi.getAllUserVotes(voterId),
+  deleteVote: (hanoukiaId, voterId) => votesApi.delete(hanoukiaId, voterId),
 
   // ========== ADMIN ==========
   verifyAdminCode: (code) => adminApi.verifyCode(code),

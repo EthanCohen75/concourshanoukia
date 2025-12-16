@@ -26,8 +26,7 @@ const HanoukiaGallery = () => {
     );
   }
 
-  // Calculate vote statistics
-  const totalVotes = hanoukiot.reduce((sum, h) => sum + h.votes.length, 0);
+  // Calculate user vote progress
   const userVotes = voterId
     ? hanoukiot.filter(h => h.votes.some(v => v.voterId === voterId)).length
     : 0;
@@ -54,12 +53,6 @@ const HanoukiaGallery = () => {
             </div>
           </div>
         )}
-
-        <div className="gallery-stats">
-          <span className="stat-item">
-            📊 {totalVotes} {totalVotes === 1 ? 'vote total' : 'votes totaux'}
-          </span>
-        </div>
       </div>
 
       <div className="gallery-grid">

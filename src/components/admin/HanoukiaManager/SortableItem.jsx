@@ -44,7 +44,7 @@ const SortableItem = ({ hanoukia, onDelete }) => {
           <strong>Hanoukia {hanoukia.number}</strong>
           <span className="item-meta">
             {hanoukia.images.length} {hanoukia.images.length === 1 ? 'image' : 'images'}
-            • {hanoukia.votes.length} {hanoukia.votes.length === 1 ? 'vote' : 'votes'}
+            • {hanoukia.votes.length} {hanoukia.votes.length === 1 ? 'note' : 'notes'}
           </span>
         </div>
       </div>

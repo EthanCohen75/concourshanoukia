@@ -28,20 +28,6 @@
           "originalName": "hanoukia2images.webp"
         }
       ]
-    },
-    {
-      "id": "f0cb91bd-903a-4eaf-bbb6-3d843bdf24c4",
-      "number": 3,
-      "order": 3,
-      "createdAt": "2025-12-15T18:28:07.742Z",
-      "images": [
-        {
-          "id": "7ced7942-9681-4bad-98d6-31be85903e08",
-          "filename": "a2ece45e-b994-47cd-a16f-79dd4155af20.webp",
-          "url": "/uploads/a2ece45e-b994-47cd-a16f-79dd4155af20.webp",
-          "originalName": "hanoukia3images.webp"
-        }
-      ]
     }
   ],
   "votes": []

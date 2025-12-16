@@ -18,7 +18,7 @@ const RatingInterface = ({ currentRating, onRate, onCancel, disabled = false }) 
       return;
     }
 
-    // Sinon, voter normalement
+    // Sinon, noter normalement
     if (onRate) {
       onRate(rating);
     }

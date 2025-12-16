@@ -21,7 +21,7 @@ const HanoukiaGallery = () => {
     return (
       <div className="gallery-empty">
         <h2>Aucune hanoukia pour le moment</h2>
-        <p>Les hanoukiot seront bientôt disponibles pour le vote !</p>
+        <p>Les hanoukiot seront bientôt disponibles pour la notation !</p>
       </div>
     );
   }
@@ -36,13 +36,13 @@ const HanoukiaGallery = () => {
       <div className="gallery-header">
         <h1>Concours de Hanoukiot</h1>
         <p className="gallery-description">
-          Découvrez les {hanoukiot.length} hanoukiot participantes et votez pour vos préférées !
+          Découvrez les {hanoukiot.length} hanoukiot participantes et notez les !
         </p>
 
         {voterId && (
           <div className="voting-progress">
             <p>
-              Vous avez voté pour <strong>{userVotes}</strong> sur{' '}
+              Vous avez noté <strong>{userVotes}</strong> sur{' '}
               <strong>{hanoukiot.length}</strong> hanoukiot
             </p>
             <div className="progress-bar">

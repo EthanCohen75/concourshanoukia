@@ -9,7 +9,7 @@ const DeleteModal = ({ hanoukia, onConfirm, onCancel, isDeleting }) => {
           Êtes-vous sûr de vouloir supprimer la <strong>Hanoukia {hanoukia.number}</strong> ?
         </p>
         <p className="warning-text">
-          Cette action supprimera également tous les votes associés ({hanoukia.votes.length} vote
+          Cette action supprimera également toutes les notes associées ({hanoukia.votes.length} note
           {hanoukia.votes.length !== 1 ? 's' : ''}).
         </p>
         <div className="modal-actions">

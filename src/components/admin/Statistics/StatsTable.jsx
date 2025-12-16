@@ -14,7 +14,7 @@ const StatsTable = ({ sortedStats, sortBy, handleSort, getSortIcon }) => {
               onClick={() => handleSort('totalVotes')}
               className={sortBy === 'totalVotes' ? 'sorted' : ''}
             >
-              Nombre de votes {getSortIcon('totalVotes')}
+              Nombre de notes {getSortIcon('totalVotes')}
             </th>
             <th
               onClick={() => handleSort('averageRating')}
@@ -31,7 +31,7 @@ const StatsTable = ({ sortedStats, sortBy, handleSort, getSortIcon }) => {
                 <strong>Hanoukia {stat.number}</strong>
               </td>
               <td className="col-votes">
-                {stat.totalVotes} {stat.totalVotes === 1 ? 'vote' : 'votes'}
+                {stat.totalVotes} {stat.totalVotes === 1 ? 'note' : 'notes'}
               </td>
               <td className="col-average">
                 <div className="rating-display">

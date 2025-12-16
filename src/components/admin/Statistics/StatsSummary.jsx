@@ -7,7 +7,7 @@ const StatsSummary = ({ stats, totalVotes, overallAverage }) => {
       </div>
       <div className="summary-card">
         <div className="summary-value">{totalVotes}</div>
-        <div className="summary-label">Votes totaux</div>
+        <div className="summary-label">Notes totales</div>
       </div>
       <div className="summary-card">
         <div className="summary-value">{overallAverage}</div>

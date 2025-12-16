@@ -47,7 +47,7 @@ const HanoukiaCard = ({ hanoukia }) => {
       setCurrentRating(null); // Reset local state
     } catch (error) {
       console.error('Error canceling vote:', error);
-      alert('Erreur lors de l\'annulation du vote');
+      alert('Erreur lors de l\'annulation de la note');
     } finally {
       setIsVoting(false);
     }

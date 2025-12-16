@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { AdminContext } from '../../context/AdminContext';
 import MediaCarousel from './MediaCarousel';
 import RatingInterface from './RatingInterface';
 import useHanoukiot from '../../hooks/useHanoukiot';
 import useVoter from '../../hooks/useVoter';
 
 const HanoukiaCard = ({ hanoukia }) => {
-  const { submitVote, getUserVote } = useHanoukiot();
+  const { submitVote, getUserVote, deleteVote } = useHanoukiot();
+  const { isAuthenticated } = useContext(AdminContext);
   const voterId = useVoter();
   const [isVoting, setIsVoting] = useState(false);
   const [currentRating, setCurrentRating] = useState(null);
@@ -37,6 +39,22 @@ const HanoukiaCard = ({ hanoukia }) => {
     }
   };
 
+  const handleCancelVote = async () => {
+    if (!voterId || !currentRating) return;
+
+    setIsVoting(true);
+
+    try {
+      await deleteVote(hanoukia.id, voterId);
+      setCurrentRating(null); // Reset local state
+    } catch (error) {
+      console.error('Error canceling vote:', error);
+      alert('Erreur lors de l\'annulation du vote');
+    } finally {
+      setIsVoting(false);
+    }
+  };
+
   return (
     <div className="hanoukia-card">
       <div className="hanoukia-header">
@@ -54,16 +72,19 @@ const HanoukiaCard = ({ hanoukia }) => {
         <RatingInterface
           currentRating={currentRating}
           onRate={handleVote}
+          onCancel={handleCancelVote}
           disabled={isVoting || !voterId}
         />
         {isVoting && <span className="voting-status">Enregistrement...</span>}
       </div>
 
-      <div className="hanoukia-footer">
-        <span className="vote-count">
-          {hanoukia.votes.length} {hanoukia.votes.length === 1 ? 'vote' : 'votes'}
-        </span>
-      </div>
+      {isAuthenticated && (
+        <div className="hanoukia-footer">
+          <span className="vote-count">
+            {hanoukia.votes.length} {hanoukia.votes.length === 1 ? 'vote' : 'votes'}
+          </span>
+        </div>
+      )}
     </div>
   );
 };

@@ -73,6 +73,16 @@ export const AppProvider = ({ children }) => {
     }
   }, []);
 
+  const deleteVote = useCallback(async (hanoukiaId, voterId) => {
+    try {
+      await api.deleteVote(hanoukiaId, voterId);
+      await loadHanoukiot();
+    } catch (error) {
+      console.error('Error deleting vote:', error);
+      throw error;
+    }
+  }, [loadHanoukiot]);
+
   const getStatistics = useCallback(async () => {
     try {
       return await api.getStatistics();
@@ -89,7 +99,7 @@ export const AppProvider = ({ children }) => {
   return (
     <AppContext.Provider value={{
       hanoukiot, loading, error, loadHanoukiot, addHanoukia, deleteHanoukia,
-      reorderHanoukiot, submitVote, getUserVote, getStatistics, getSortedHanoukiot
+      reorderHanoukiot, submitVote, getUserVote, deleteVote, getStatistics, getSortedHanoukiot
     }}>
       {children}
     </AppContext.Provider>

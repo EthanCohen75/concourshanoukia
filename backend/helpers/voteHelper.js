@@ -61,6 +61,23 @@ const voteHelper = {
    */
   findUserVotes(votes, voterId) {
     return votes.filter(v => v.voterId === voterId);
+  },
+
+  /**
+   * Supprimer un vote
+   */
+  removeVote(votes, hanoukiaId, voterId) {
+    const initialLength = votes.length;
+    const index = votes.findIndex(
+      v => v.hanoukiaId === hanoukiaId && v.voterId === voterId
+    );
+
+    if (index >= 0) {
+      votes.splice(index, 1);
+      return true;
+    }
+
+    return false;
   }
 };
 

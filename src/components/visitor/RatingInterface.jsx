@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { RATING_MIN, RATING_MAX } from '../../utils/constants';
 
-const RatingInterface = ({ currentRating, onRate, disabled = false }) => {
+const RatingInterface = ({ currentRating, onRate, onCancel, disabled = false }) => {
   const [hoveredRating, setHoveredRating] = useState(null);
 
   const ratings = Array.from(
@@ -10,7 +10,16 @@ const RatingInterface = ({ currentRating, onRate, disabled = false }) => {
   );
 
   const handleClick = (rating) => {
-    if (!disabled && onRate) {
+    if (disabled) return;
+
+    // Toggle: Si on reclique sur la même note, annuler
+    if (rating === currentRating && onCancel) {
+      onCancel();
+      return;
+    }
+
+    // Sinon, voter normalement
+    if (onRate) {
       onRate(rating);
     }
   };
@@ -40,6 +49,15 @@ const RatingInterface = ({ currentRating, onRate, disabled = false }) => {
           <span className="current-rating-text">
             Votre note : <strong>{currentRating}/{RATING_MAX}</strong>
           </span>
+          {onCancel && !disabled && (
+            <button
+              className="btn-cancel-vote"
+              onClick={onCancel}
+              aria-label="Annuler ma note"
+            >
+              ✕ Annuler ma note
+            </button>
+          )}
         </div>
       )}
     </div>

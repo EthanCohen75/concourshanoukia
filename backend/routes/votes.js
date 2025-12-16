@@ -15,4 +15,7 @@ router.get('/:hanoukiaId/:voterId', votesController.getUserVote);
 // GET - Récupérer tous les votes d'un utilisateur
 router.get('/user/:voterId', votesController.getAllUserVotes);
 
+// DELETE - Supprimer un vote
+router.delete('/:hanoukiaId/:voterId', votesController.deleteVote);
+
 module.exports = router;

@@ -58,6 +58,28 @@ const votesApi = {
       console.error('[votesApi] Error in getAllUserVotes:', error);
       return [];
     }
+  },
+
+  /**
+   * Supprimer un vote
+   */
+  async delete(hanoukiaId, voterId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/votes/${hanoukiaId}/${voterId}`, {
+        method: 'DELETE',
+        headers: defaultHeaders
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Erreur lors de la suppression du vote');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('[votesApi] Error in delete:', error);
+      throw error;
+    }
   }
 };
 

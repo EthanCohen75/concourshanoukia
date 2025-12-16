@@ -74,6 +74,35 @@ const votesController = {
       console.error('Error in getAllUserVotes:', error);
       res.status(500).json({ error: 'Erreur lors de la récupération des votes' });
     }
+  },
+
+  /**
+   * Supprimer un vote
+   */
+  async deleteVote(req, res) {
+    try {
+      const { hanoukiaId, voterId } = req.params;
+
+      // Valider les paramètres
+      if (!hanoukiaId || !voterId) {
+        return res.status(400).json({ error: 'hanoukiaId et voterId requis' });
+      }
+
+      const db = await databaseService.readDatabase();
+
+      // Supprimer le vote
+      const deleted = voteHelper.removeVote(db.votes, hanoukiaId, voterId);
+
+      if (deleted) {
+        await databaseService.writeDatabase(db);
+        return res.json({ success: true, message: 'Vote supprimé avec succès' });
+      } else {
+        return res.status(404).json({ error: 'Vote non trouvé' });
+      }
+    } catch (error) {
+      console.error('Error in deleteVote:', error);
+      res.status(500).json({ error: 'Erreur serveur' });
+    }
   }
 };
 

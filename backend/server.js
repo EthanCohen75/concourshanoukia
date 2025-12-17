@@ -64,6 +64,30 @@ app.post('/api/admin/verify', (req, res) => {
   }
 });
 
+// Route temporaire pour changer le code admin
+app.post('/api/admin/change-password', (req, res) => {
+  const { oldCode, newCode } = req.body;
+  const dbPath = path.join(__dirname, 'data', 'db.json');
+
+  try {
+    const data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+
+    // Vérifier l'ancien code
+    if (oldCode !== data.adminCode) {
+      return res.status(403).json({ error: 'Ancien code incorrect' });
+    }
+
+    // Mettre à jour avec le nouveau code
+    data.adminCode = newCode;
+    fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf8');
+
+    res.json({ success: true, message: 'Code admin modifié avec succès' });
+  } catch (error) {
+    console.error('Error changing admin code:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
 // Gestion des erreurs
 app.use((err, req, res, next) => {
   console.error('Error:', err);

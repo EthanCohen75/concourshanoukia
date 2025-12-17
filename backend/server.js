@@ -6,13 +6,21 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Configuration CORS pour permettre l'accès depuis Vercel
+const corsOptions = {
+  origin: '*', // Permet toutes les origines (vous pouvez restreindre à votre domaine Vercel si besoin)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Servir les fichiers uploads statiquement
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Servir les fichiers uploads statiquement avec les bons headers CORS
+app.use('/uploads', cors(corsOptions), express.static(path.join(__dirname, 'uploads')));
 
 // S'assurer que les dossiers nécessaires existent
 const uploadsDir = path.join(__dirname, 'uploads');

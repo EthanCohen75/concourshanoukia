@@ -8,6 +8,7 @@ const AddHanoukia = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [uploaderKey, setUploaderKey] = useState(0); // Pour forcer le reset du MediaUploader
 
   const { addHanoukia, hanoukiot } = useHanoukiot();
   const { getAdminCode } = useContext(AdminContext);
@@ -35,6 +36,7 @@ const AddHanoukia = () => {
       const newHanoukia = await addHanoukia(imageFiles, adminCode);
       setSuccessMessage(`Hanoukia ${newHanoukia.number} ajoutée avec succès !`);
       setImageFiles([]);
+      setUploaderKey(prev => prev + 1); // Force la réinitialisation complète du MediaUploader
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       console.error('Error adding hanoukia:', error);
@@ -58,7 +60,7 @@ const AddHanoukia = () => {
           <label className="form-label">
             Images de la hanoukia *
           </label>
-          <MediaUploader onImagesChange={handleImagesChange} />
+          <MediaUploader key={uploaderKey} onImagesChange={handleImagesChange} />
         </div>
 
         {successMessage && (

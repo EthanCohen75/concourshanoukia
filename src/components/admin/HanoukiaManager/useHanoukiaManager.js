@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import useHanoukiot from '../../../hooks/useHanoukiot';
 import { AdminContext } from '../../../context/AdminContext';
@@ -10,6 +10,11 @@ const useHanoukiaManager = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [isReordering, setIsReordering] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Synchroniser le state local avec le contexte global
+  useEffect(() => {
+    setHanoukiot(getSortedHanoukiot());
+  }, [getSortedHanoukiot]);
 
   const handleDragEnd = async (event) => {
     const { active, over } = event;
@@ -46,7 +51,7 @@ const useHanoukiaManager = () => {
       try {
         const adminCode = getAdminCode();
         await deleteHanoukia(deleteConfirm.id, adminCode);
-        setHanoukiot(getSortedHanoukiot());
+        // Le state sera automatiquement mis à jour par le useEffect ci-dessus
         setDeleteConfirm(null);
       } catch (error) {
         console.error('Error deleting hanoukia:', error);

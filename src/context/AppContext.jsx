@@ -58,6 +58,37 @@ export const AppProvider = ({ children }) => {
   const submitVote = useCallback(async (hanoukiaId, voterId, rating) => {
     try {
       await api.submitVote(hanoukiaId, voterId, rating);
+
+      // Mise à jour optimiste du state local (sans recharger depuis le serveur)
+      setHanoukiot(prevHanoukiot =>
+        prevHanoukiot.map(h => {
+          if (h.id !== hanoukiaId) return h;
+
+          // Vérifier si le vote existe déjà
+          const existingVoteIndex = h.votes.findIndex(v => v.voterId === voterId);
+          const updatedVotes = [...h.votes];
+
+          if (existingVoteIndex >= 0) {
+            // Mettre à jour le vote existant
+            updatedVotes[existingVoteIndex] = {
+              ...updatedVotes[existingVoteIndex],
+              rating,
+              timestamp: new Date().toISOString()
+            };
+          } else {
+            // Ajouter un nouveau vote
+            updatedVotes.push({
+              id: `temp-${Date.now()}`, // ID temporaire
+              hanoukiaId,
+              voterId,
+              rating,
+              timestamp: new Date().toISOString()
+            });
+          }
+
+          return { ...h, votes: updatedVotes };
+        })
+      );
     } catch (error) {
       console.error('Error submitting vote:', error);
       throw error;
@@ -76,12 +107,22 @@ export const AppProvider = ({ children }) => {
   const deleteVote = useCallback(async (hanoukiaId, voterId) => {
     try {
       await api.deleteVote(hanoukiaId, voterId);
-      await loadHanoukiot();
+
+      // Mise à jour optimiste du state local (sans recharger depuis le serveur)
+      setHanoukiot(prevHanoukiot =>
+        prevHanoukiot.map(h => {
+          if (h.id !== hanoukiaId) return h;
+
+          // Retirer le vote de cette hanoukia
+          const updatedVotes = h.votes.filter(v => v.voterId !== voterId);
+          return { ...h, votes: updatedVotes };
+        })
+      );
     } catch (error) {
       console.error('Error deleting vote:', error);
       throw error;
     }
-  }, [loadHanoukiot]);
+  }, []);
 
   const getStatistics = useCallback(async () => {
     try {

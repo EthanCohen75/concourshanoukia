@@ -2,21 +2,36 @@ import { useState } from 'react';
 import HanoukiaCard from './HanoukiaCard';
 import useHanoukiot from '../../hooks/useHanoukiot';
 import useVoteSession from '../../hooks/useVoteSession';
+import { isContestClosed, getDeadlineFormatted } from '../../config/contest';
 
 const HanoukiaGallery = () => {
   const { getSortedHanoukiot, loading } = useHanoukiot();
-  const { votesCount, allVoted, submitAll, isSubmitting } = useVoteSession();
+  const { votesCount, allVoted, submitAll, isSubmitting, hasSubmitted, votesChanged } = useVoteSession();
   const [showSuccess, setShowSuccess] = useState(false);
+  const contestClosed = isContestClosed();
 
   const hanoukiot = getSortedHanoukiot();
 
+  // Déterminer si le bouton doit être actif
+  const canSubmit = hasSubmitted ? (allVoted && votesChanged) : allVoted;
+
   const handleSubmitAll = async () => {
+    if (contestClosed) {
+      alert(`Le concours est clôturé depuis le ${getDeadlineFormatted()}`);
+      return;
+    }
+
     try {
       await submitAll();
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 5000);
     } catch (error) {
-      alert('Erreur lors de la soumission des notes');
+      // Gérer l'erreur de clôture
+      if (error.message && error.message.includes('clôturé')) {
+        alert(error.message);
+      } else {
+        alert('Erreur lors de la soumission des notes');
+      }
     }
   };
 
@@ -60,27 +75,46 @@ const HanoukiaGallery = () => {
             />
           </div>
 
-          {votesCount === 0 && (
+          {contestClosed && (
+            <p className="progress-closed">
+              🔒 Le concours est clôturé depuis le {getDeadlineFormatted()}
+            </p>
+          )}
+
+          {!contestClosed && !hasSubmitted && votesCount === 0 && (
             <p className="progress-info">
               ℹ️ Notez toutes les hanoukiot pour pouvoir soumettre vos notes
             </p>
           )}
 
-          {!allVoted && votesCount > 0 && (
+          {!contestClosed && !hasSubmitted && !allVoted && votesCount > 0 && (
             <p className="progress-hint">
               ⚠️ Vous devez noter toutes les hanoukiot avant de pouvoir soumettre vos notes
             </p>
           )}
+
+          {!contestClosed && hasSubmitted && !votesChanged && (
+            <p className="progress-info">
+              ✅ Vos notes ont été soumises. Modifiez-les si vous souhaitez les mettre à jour.
+            </p>
+          )}
+
+          {!contestClosed && hasSubmitted && votesChanged && !allVoted && (
+            <p className="progress-hint">
+              ⚠️ Vous devez noter toutes les hanoukiot pour pouvoir modifier vos notes
+            </p>
+          )}
         </div>
 
-        {!showSuccess && (
+        {!showSuccess && !contestClosed && (
           <button
             className="btn-submit-all"
             onClick={handleSubmitAll}
-            disabled={!allVoted || isSubmitting}
+            disabled={!canSubmit || isSubmitting}
           >
             {isSubmitting ? '⏳ Soumission en cours...' :
-             allVoted ? '✅ Soumettre mes notes' : '🔒 Notez toutes les hanoukiot pour soumettre'}
+             hasSubmitted ? (canSubmit ? '✏️ Modifier mes notes' : '🔒 Changez vos notes pour modifier') :
+             (allVoted ? '✅ Soumettre mes notes' : '🔒 Notez toutes les hanoukiot pour soumettre')}
           </button>
         )}
 
@@ -93,20 +127,21 @@ const HanoukiaGallery = () => {
 
       <div className="gallery-grid">
         {hanoukiot.map(hanoukia => (
-          <HanoukiaCard key={hanoukia.id} hanoukia={hanoukia} />
+          <HanoukiaCard key={hanoukia.id} hanoukia={hanoukia} disabled={contestClosed} />
         ))}
       </div>
 
       {/* Bouton de soumission en bas de page */}
       <div className="gallery-footer">
-        {!showSuccess && (
+        {!showSuccess && !contestClosed && (
           <button
             className="btn-submit-all"
             onClick={handleSubmitAll}
-            disabled={!allVoted || isSubmitting}
+            disabled={!canSubmit || isSubmitting}
           >
             {isSubmitting ? '⏳ Soumission en cours...' :
-             allVoted ? '✅ Soumettre mes notes' : '🔒 Notez toutes les hanoukiot pour soumettre'}
+             hasSubmitted ? (canSubmit ? '✏️ Modifier mes notes' : '🔒 Changez vos notes pour modifier') :
+             (allVoted ? '✅ Soumettre mes notes' : '🔒 Notez toutes les hanoukiot pour soumettre')}
           </button>
         )}
 

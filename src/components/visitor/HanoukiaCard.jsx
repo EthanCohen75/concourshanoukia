@@ -3,7 +3,7 @@ import MediaCarousel from './MediaCarousel';
 import RatingInterface from './RatingInterface';
 import useVoteSession from '../../hooks/useVoteSession';
 
-const HanoukiaCard = ({ hanoukia }) => {
+const HanoukiaCard = ({ hanoukia, disabled = false }) => {
   const { tempVotes, saveTempVote, removeTempVote } = useVoteSession();
   const [currentRating, setCurrentRating] = useState(null);
 
@@ -35,10 +35,10 @@ const HanoukiaCard = ({ hanoukia }) => {
 
       <div className="hanoukia-voting">
         <h3 className="voting-title">
-          {currentRating ? 'Modifier votre note' : 'Notez cette hanoukia'}
+          {disabled ? 'Votre note' : currentRating ? 'Modifier votre note' : 'Notez cette hanoukia'}
         </h3>
 
-        {currentRating && (
+        {!disabled && currentRating && (
           <span className="vote-draft-badge">📝 Brouillon</span>
         )}
 
@@ -46,7 +46,7 @@ const HanoukiaCard = ({ hanoukia }) => {
           currentRating={currentRating}
           onRate={handleVote}
           onCancel={handleCancelVote}
-          disabled={false}
+          disabled={disabled}
         />
       </div>
     </div>

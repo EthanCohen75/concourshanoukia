@@ -9,6 +9,7 @@ export const AppProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tempVotes, setTempVotes] = useState({});
+  const [submittedVotes, setSubmittedVotes] = useState({}); // Votes déjà soumis au backend
 
   const loadHanoukiot = useCallback(async () => {
     try {
@@ -26,9 +27,46 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => { loadHanoukiot(); }, [loadHanoukiot]);
 
-  // Charger les votes temporaires au démarrage
+  // Charger les votes existants au démarrage
   useEffect(() => {
-    setTempVotes(storage.getTempVotes());
+    const loadExistingVotes = async () => {
+      try {
+        // Récupérer le voterId depuis localStorage
+        const voterId = storage.getVoterId();
+
+        if (voterId) {
+          // Charger les votes depuis le backend
+          const existingVotes = await api.getUserVotes(voterId);
+
+          if (existingVotes && existingVotes.length > 0) {
+            // Convertir le tableau en objet { hanoukiaId: rating }
+            const votesMap = {};
+            existingVotes.forEach(vote => {
+              votesMap[vote.hanoukiaId] = vote.rating;
+            });
+
+            // Sauvegarder dans localStorage et state
+            Object.entries(votesMap).forEach(([hanoukiaId, rating]) => {
+              storage.saveTempVote(hanoukiaId, rating);
+            });
+            setTempVotes(votesMap);
+            setSubmittedVotes(votesMap); // Stocker les votes soumis pour comparaison
+          } else {
+            // Sinon charger depuis localStorage
+            setTempVotes(storage.getTempVotes());
+          }
+        } else {
+          // Pas de voterId, charger depuis localStorage
+          setTempVotes(storage.getTempVotes());
+        }
+      } catch (error) {
+        console.error('Error loading existing votes:', error);
+        // En cas d'erreur, fallback sur localStorage
+        setTempVotes(storage.getTempVotes());
+      }
+    };
+
+    loadExistingVotes();
   }, []);
 
   const addHanoukia = useCallback(async (imageFiles, adminCode) => {
@@ -149,13 +187,51 @@ export const AppProvider = ({ children }) => {
   const submitAllVotes = useCallback(async (voterId, votes) => {
     try {
       await api.submitAllVotes(voterId, votes);
-      clearTempVotes(); // Vider les votes temporaires
       await loadHanoukiot(); // Recharger les données
+
+      // Créer votesMap à partir des votes soumis
+      const votesMap = {};
+      votes.forEach(vote => {
+        votesMap[vote.hanoukiaId] = vote.rating;
+      });
+
+      // Essayer de recharger depuis le backend pour confirmation
+      try {
+        const existingVotes = await api.getUserVotes(voterId);
+        if (existingVotes && existingVotes.length > 0) {
+          // Si le backend retourne les votes, les utiliser
+          const backendVotesMap = {};
+          existingVotes.forEach(vote => {
+            backendVotesMap[vote.hanoukiaId] = vote.rating;
+          });
+          // Mettre à jour avec les votes du backend
+          Object.entries(backendVotesMap).forEach(([hanoukiaId, rating]) => {
+            storage.saveTempVote(hanoukiaId, rating);
+          });
+          setTempVotes(backendVotesMap);
+          setSubmittedVotes(backendVotesMap);
+        } else {
+          // FALLBACK: Utiliser les votes qu'on vient de soumettre
+          Object.entries(votesMap).forEach(([hanoukiaId, rating]) => {
+            storage.saveTempVote(hanoukiaId, rating);
+          });
+          setTempVotes(votesMap);
+          setSubmittedVotes(votesMap); // ✅ Toujours mis à jour
+        }
+      } catch (error) {
+        // En cas d'erreur lors du rechargement, utiliser les votes soumis
+        console.error('Error reloading votes, using submitted votes:', error);
+        Object.entries(votesMap).forEach(([hanoukiaId, rating]) => {
+          storage.saveTempVote(hanoukiaId, rating);
+        });
+        setTempVotes(votesMap);
+        setSubmittedVotes(votesMap); // ✅ Toujours mis à jour
+      }
     } catch (error) {
       console.error('Error submitting all votes:', error);
       throw error;
     }
-  }, [loadHanoukiot, clearTempVotes]);
+  }, [loadHanoukiot]);
 
   const getStatistics = useCallback(async () => {
     try {
@@ -174,7 +250,7 @@ export const AppProvider = ({ children }) => {
     <AppContext.Provider value={{
       hanoukiot, loading, error, loadHanoukiot, addHanoukia, deleteHanoukia,
       reorderHanoukiot, submitVote, getUserVote, deleteVote, submitAllVotes, getStatistics, getSortedHanoukiot,
-      tempVotes, saveTempVote, removeTempVote, clearTempVotes
+      tempVotes, saveTempVote, removeTempVote, clearTempVotes, submittedVotes
     }}>
       {children}
     </AppContext.Provider>

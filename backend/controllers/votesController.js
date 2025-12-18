@@ -1,5 +1,6 @@
 const databaseService = require('../services/databaseService');
 const voteHelper = require('../helpers/voteHelper');
+const { isContestClosed, getDeadlineFormatted } = require('../config/contest');
 
 /**
  * Contrôleur pour la gestion des votes
@@ -111,6 +112,14 @@ const votesController = {
   async submitAllVotes(req, res) {
     try {
       const { voterId, votes } = req.body;
+
+      // Vérifier si le concours est clôturé
+      if (isContestClosed()) {
+        return res.status(403).json({
+          error: `Le concours est clôturé depuis le ${getDeadlineFormatted()}`,
+          closed: true
+        });
+      }
 
       // Validation
       if (!voterId || !votes || !Array.isArray(votes)) {

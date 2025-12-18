@@ -95,7 +95,7 @@ const votesApi = {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Erreur lors de la soumission des votes');
+        throw new Error(error.error || 'Erreur lors de la soumission des notes');
       }
 
       return await response.json();

@@ -16,7 +16,7 @@ const HanoukiaGallery = () => {
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 5000);
     } catch (error) {
-      alert('Erreur lors de la soumission des votes');
+      alert('Erreur lors de la soumission des notes');
     }
   };
 
@@ -42,8 +42,10 @@ const HanoukiaGallery = () => {
     <div className="hanoukia-gallery">
       <div className="gallery-header">
         <h1>Concours de Hanoukiot</h1>
+        <p className="gallery-school">École AJJ - ישיבה תורה ורחמים</p>
+        <p className="gallery-class">Kita Beth (CE1)</p>
         <p className="gallery-description">
-          Découvrez les {hanoukiot.length} hanoukiot participantes et notez les !
+          Découvrez les {hanoukiot.length} hanoukiot réalisées par les enfants et notez-les !
         </p>
 
         <div className="voting-progress">
@@ -60,13 +62,13 @@ const HanoukiaGallery = () => {
 
           {votesCount === 0 && (
             <p className="progress-info">
-              ℹ️ Notez toutes les hanoukiot pour pouvoir soumettre vos votes
+              ℹ️ Notez toutes les hanoukiot pour pouvoir soumettre vos notes
             </p>
           )}
 
           {!allVoted && votesCount > 0 && (
             <p className="progress-hint">
-              ⚠️ Vous devez noter toutes les hanoukiot avant de pouvoir soumettre vos votes
+              ⚠️ Vous devez noter toutes les hanoukiot avant de pouvoir soumettre vos notes
             </p>
           )}
         </div>
@@ -78,13 +80,13 @@ const HanoukiaGallery = () => {
             disabled={!allVoted || isSubmitting}
           >
             {isSubmitting ? '⏳ Soumission en cours...' :
-             allVoted ? '✅ Soumettre mes votes' : '🔒 Notez toutes les hanoukiot pour soumettre'}
+             allVoted ? '✅ Soumettre mes notes' : '🔒 Notez toutes les hanoukiot pour soumettre'}
           </button>
         )}
 
         {showSuccess && (
           <div className="success-message">
-            ✅ Vos votes ont été enregistrés avec succès !
+            ✅ Vos notes ont été enregistrées avec succès !
           </div>
         )}
       </div>
@@ -104,13 +106,13 @@ const HanoukiaGallery = () => {
             disabled={!allVoted || isSubmitting}
           >
             {isSubmitting ? '⏳ Soumission en cours...' :
-             allVoted ? '✅ Soumettre mes votes' : '🔒 Notez toutes les hanoukiot pour soumettre'}
+             allVoted ? '✅ Soumettre mes notes' : '🔒 Notez toutes les hanoukiot pour soumettre'}
           </button>
         )}
 
         {showSuccess && (
           <div className="success-message">
-            ✅ Vos votes ont été enregistrés avec succès !
+            ✅ Vos notes ont été enregistrées avec succès !
           </div>
         )}
       </div>

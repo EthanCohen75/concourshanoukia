@@ -340,6 +340,22 @@ body::before {
   text-shadow: 0 0 40px rgba(212, 175, 55, 0.5);
 }
 
+.gallery-school {
+  color: var(--gold-bright);
+  font-size: 1.3rem;
+  margin-bottom: var(--space-xs);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.gallery-class {
+  color: var(--gold-pale);
+  font-size: 1rem;
+  margin-bottom: var(--space-md);
+  font-weight: 500;
+  opacity: 0.9;
+}
+
 .gallery-description {
   color: var(--gold-pale);
   font-size: 1.2rem;

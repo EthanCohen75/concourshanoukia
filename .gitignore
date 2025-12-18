@@ -31,4 +31,4 @@ Thumbs.db
 npm-debug.log*
 
 # Database (si vous voulez garder db.json versionné, retirez cette ligne)
-# backend/data/db.json
+backend/data/db.json

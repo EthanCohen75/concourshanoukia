@@ -25,6 +25,7 @@ app.use('/uploads', cors(corsOptions), express.static(path.join(__dirname, 'uplo
 // S'assurer que les dossiers nécessaires existent
 const uploadsDir = path.join(__dirname, 'uploads');
 const dataDir = path.join(__dirname, 'data');
+const dbPath = path.join(__dirname, 'data', 'db.json');
 
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
@@ -32,6 +33,17 @@ if (!fs.existsSync(uploadsDir)) {
 
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
+}
+
+// Initialiser db.json s'il n'existe pas
+if (!fs.existsSync(dbPath)) {
+  const initialDb = {
+    adminCode: 'petitbb',
+    hanoukiot: [],
+    votes: []
+  };
+  fs.writeFileSync(dbPath, JSON.stringify(initialDb, null, 2), 'utf8');
+  console.log('✅ Base de données initialisée avec le code admin: petitbb');
 }
 
 // Routes

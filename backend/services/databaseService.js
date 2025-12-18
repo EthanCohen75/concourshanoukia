@@ -17,11 +17,14 @@ const databaseService = {
     } catch (error) {
       console.error('Error reading database:', error);
       // Retourner une structure par défaut si la DB n'existe pas
-      return {
-        adminCode: 'default-code-5786',
+      const defaultDb = {
+        adminCode: 'petitbb',
         hanoukiot: [],
         votes: []
       };
+      // Créer le fichier avec la structure par défaut
+      await this.writeDatabase(defaultDb);
+      return defaultDb;
     }
   },
 

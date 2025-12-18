@@ -80,6 +80,29 @@ const votesApi = {
       console.error('[votesApi] Error in delete:', error);
       throw error;
     }
+  },
+
+  /**
+   * Soumettre tous les votes en une fois
+   */
+  async submitAll(voterId, votes) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/votes/submit-all`, {
+        method: 'POST',
+        headers: defaultHeaders,
+        body: JSON.stringify({ voterId, votes })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Erreur lors de la soumission des votes');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('[votesApi] Error in submitAll:', error);
+      throw error;
+    }
   }
 };
 

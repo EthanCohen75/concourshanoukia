@@ -78,6 +78,42 @@ const voteHelper = {
     }
 
     return false;
+  },
+
+  /**
+   * Soumettre tous les votes en batch
+   */
+  async submitBatchVotes(db, voterId, votes) {
+    const databaseService = require('../services/databaseService');
+    const results = [];
+
+    for (const { hanoukiaId, rating } of votes) {
+      // Chercher si vote existe déjà
+      const existingVote = db.votes.find(
+        v => v.hanoukiaId === hanoukiaId && v.voterId === voterId
+      );
+
+      if (existingVote) {
+        // Mettre à jour
+        existingVote.rating = rating;
+        existingVote.timestamp = new Date().toISOString();
+        results.push(existingVote);
+      } else {
+        // Créer nouveau
+        const newVote = {
+          id: uuidv4(),
+          hanoukiaId,
+          voterId,
+          rating,
+          timestamp: new Date().toISOString()
+        };
+        db.votes.push(newVote);
+        results.push(newVote);
+      }
+    }
+
+    await databaseService.writeDatabase(db);
+    return results;
   }
 };
 

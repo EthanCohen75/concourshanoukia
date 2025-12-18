@@ -103,6 +103,52 @@ const votesController = {
       console.error('Error in deleteVote:', error);
       res.status(500).json({ error: 'Erreur serveur' });
     }
+  },
+
+  /**
+   * Soumettre tous les votes en une fois
+   */
+  async submitAllVotes(req, res) {
+    try {
+      const { voterId, votes } = req.body;
+
+      // Validation
+      if (!voterId || !votes || !Array.isArray(votes)) {
+        return res.status(400).json({ error: 'voterId et votes requis' });
+      }
+
+      const db = await databaseService.readDatabase();
+      const totalHanoukiot = db.hanoukiot.length;
+
+      // Vérifier que tous les votes sont présents
+      if (votes.length !== totalHanoukiot) {
+        return res.status(400).json({
+          error: `Vous devez noter toutes les hanoukiot (${votes.length}/${totalHanoukiot})`
+        });
+      }
+
+      // Valider chaque vote
+      for (const vote of votes) {
+        if (!vote.hanoukiaId || !vote.rating) {
+          return res.status(400).json({ error: 'Format de vote invalide' });
+        }
+        if (vote.rating < 1 || vote.rating > 10) {
+          return res.status(400).json({ error: 'Rating doit être entre 1 et 10' });
+        }
+      }
+
+      // Soumettre tous les votes
+      const results = await voteHelper.submitBatchVotes(db, voterId, votes);
+
+      res.json({
+        success: true,
+        message: 'Tous les votes ont été enregistrés',
+        votes: results
+      });
+    } catch (error) {
+      console.error('Error in submitAllVotes:', error);
+      res.status(500).json({ error: 'Erreur serveur' });
+    }
   }
 };
 

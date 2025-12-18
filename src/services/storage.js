@@ -1,5 +1,6 @@
 const STORAGE_KEY = 'hanoukia-competition-data';
 const VOTER_KEY = 'hanoukia-voter-id';
+const TEMP_VOTES_KEY = 'hanoukia-temp-votes';
 
 // Generate a simple UUID
 const generateUUID = () => {
@@ -70,6 +71,41 @@ const storage = {
   clearAll: () => {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(VOTER_KEY);
+  },
+
+  // Get all temporary votes
+  getTempVotes: () => {
+    try {
+      const stored = localStorage.getItem(TEMP_VOTES_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      console.error('Error reading temp votes:', error);
+      return {};
+    }
+  },
+
+  // Save a temporary vote
+  saveTempVote: (hanoukiaId, rating) => {
+    const votes = storage.getTempVotes();
+    votes[hanoukiaId] = rating;
+    localStorage.setItem(TEMP_VOTES_KEY, JSON.stringify(votes));
+  },
+
+  // Remove a temporary vote
+  removeTempVote: (hanoukiaId) => {
+    const votes = storage.getTempVotes();
+    delete votes[hanoukiaId];
+    localStorage.setItem(TEMP_VOTES_KEY, JSON.stringify(votes));
+  },
+
+  // Clear all temporary votes
+  clearTempVotes: () => {
+    localStorage.removeItem(TEMP_VOTES_KEY);
+  },
+
+  // Count how many temporary votes
+  getTempVotesCount: () => {
+    return Object.keys(storage.getTempVotes()).length;
   }
 };
 

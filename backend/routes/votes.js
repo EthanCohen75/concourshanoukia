@@ -18,4 +18,7 @@ router.get('/user/:voterId', votesController.getAllUserVotes);
 // DELETE - Supprimer un vote
 router.delete('/:hanoukiaId/:voterId', votesController.deleteVote);
 
+// POST - Soumettre tous les votes en une fois
+router.post('/submit-all', votesController.submitAllVotes);
+
 module.exports = router;

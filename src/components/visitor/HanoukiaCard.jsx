@@ -1,56 +1,26 @@
 import { useState, useEffect } from 'react';
 import MediaCarousel from './MediaCarousel';
 import RatingInterface from './RatingInterface';
-import useHanoukiot from '../../hooks/useHanoukiot';
-import useVoter from '../../hooks/useVoter';
+import useVoteSession from '../../hooks/useVoteSession';
 
 const HanoukiaCard = ({ hanoukia }) => {
-  const { submitVote, getUserVote, deleteVote } = useHanoukiot();
-  const voterId = useVoter();
-  const [isVoting, setIsVoting] = useState(false);
+  const { tempVotes, saveTempVote, removeTempVote } = useVoteSession();
   const [currentRating, setCurrentRating] = useState(null);
 
-  // Load current user vote on mount
+  // Charger vote temporaire au montage
   useEffect(() => {
-    const loadUserVote = async () => {
-      if (voterId && hanoukia.id) {
-        const rating = await getUserVote(hanoukia.id, voterId);
-        setCurrentRating(rating);
-      }
-    };
-    loadUserVote();
-  }, [voterId, hanoukia.id, getUserVote]);
+    const tempRating = tempVotes[hanoukia.id];
+    setCurrentRating(tempRating || null);
+  }, [tempVotes, hanoukia.id]);
 
-  const handleVote = async (rating) => {
-    if (!voterId) return;
-
-    setIsVoting(true);
-
-    try {
-      await submitVote(hanoukia.id, voterId, rating);
-      setCurrentRating(rating); // Update local state immediately
-    } catch (error) {
-      console.error('Error submitting vote:', error);
-      // Optional: Show error message
-    } finally {
-      setIsVoting(false);
-    }
+  const handleVote = (rating) => {
+    saveTempVote(hanoukia.id, rating);
+    setCurrentRating(rating);
   };
 
-  const handleCancelVote = async () => {
-    if (!voterId || !currentRating) return;
-
-    setIsVoting(true);
-
-    try {
-      await deleteVote(hanoukia.id, voterId);
-      setCurrentRating(null); // Reset local state
-    } catch (error) {
-      console.error('Error canceling vote:', error);
-      alert('Erreur lors de l\'annulation de la note');
-    } finally {
-      setIsVoting(false);
-    }
+  const handleCancelVote = () => {
+    removeTempVote(hanoukia.id);
+    setCurrentRating(null);
   };
 
   return (
@@ -67,13 +37,17 @@ const HanoukiaCard = ({ hanoukia }) => {
         <h3 className="voting-title">
           {currentRating ? 'Modifier votre note' : 'Notez cette hanoukia'}
         </h3>
+
+        {currentRating && (
+          <span className="vote-draft-badge">📝 Brouillon</span>
+        )}
+
         <RatingInterface
           currentRating={currentRating}
           onRate={handleVote}
           onCancel={handleCancelVote}
-          disabled={isVoting || !voterId}
+          disabled={false}
         />
-        {isVoting && <span className="voting-status">Enregistrement...</span>}
       </div>
     </div>
   );

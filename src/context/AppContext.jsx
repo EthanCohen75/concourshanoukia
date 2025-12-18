@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
+import { storage } from '../services/storage';
 
 export const AppContext = createContext(null);
 
@@ -7,6 +8,7 @@ export const AppProvider = ({ children }) => {
   const [hanoukiot, setHanoukiot] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [tempVotes, setTempVotes] = useState({});
 
   const loadHanoukiot = useCallback(async () => {
     try {
@@ -23,6 +25,11 @@ export const AppProvider = ({ children }) => {
   }, []);
 
   useEffect(() => { loadHanoukiot(); }, [loadHanoukiot]);
+
+  // Charger les votes temporaires au démarrage
+  useEffect(() => {
+    setTempVotes(storage.getTempVotes());
+  }, []);
 
   const addHanoukia = useCallback(async (imageFiles, adminCode) => {
     try {
@@ -124,6 +131,32 @@ export const AppProvider = ({ children }) => {
     }
   }, []);
 
+  const saveTempVote = useCallback((hanoukiaId, rating) => {
+    storage.saveTempVote(hanoukiaId, rating);
+    setTempVotes(storage.getTempVotes());
+  }, []);
+
+  const removeTempVote = useCallback((hanoukiaId) => {
+    storage.removeTempVote(hanoukiaId);
+    setTempVotes(storage.getTempVotes());
+  }, []);
+
+  const clearTempVotes = useCallback(() => {
+    storage.clearTempVotes();
+    setTempVotes({});
+  }, []);
+
+  const submitAllVotes = useCallback(async (voterId, votes) => {
+    try {
+      await api.submitAllVotes(voterId, votes);
+      clearTempVotes(); // Vider les votes temporaires
+      await loadHanoukiot(); // Recharger les données
+    } catch (error) {
+      console.error('Error submitting all votes:', error);
+      throw error;
+    }
+  }, [loadHanoukiot, clearTempVotes]);
+
   const getStatistics = useCallback(async () => {
     try {
       return await api.getStatistics();
@@ -140,7 +173,8 @@ export const AppProvider = ({ children }) => {
   return (
     <AppContext.Provider value={{
       hanoukiot, loading, error, loadHanoukiot, addHanoukia, deleteHanoukia,
-      reorderHanoukiot, submitVote, getUserVote, deleteVote, getStatistics, getSortedHanoukiot
+      reorderHanoukiot, submitVote, getUserVote, deleteVote, submitAllVotes, getStatistics, getSortedHanoukiot,
+      tempVotes, saveTempVote, removeTempVote, clearTempVotes
     }}>
       {children}
     </AppContext.Provider>

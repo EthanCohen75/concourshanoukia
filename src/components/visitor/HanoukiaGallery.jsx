@@ -1,12 +1,24 @@
+import { useState } from 'react';
 import HanoukiaCard from './HanoukiaCard';
 import useHanoukiot from '../../hooks/useHanoukiot';
-import useVoter from '../../hooks/useVoter';
+import useVoteSession from '../../hooks/useVoteSession';
 
 const HanoukiaGallery = () => {
   const { getSortedHanoukiot, loading } = useHanoukiot();
-  const voterId = useVoter();
+  const { votesCount, allVoted, submitAll, isSubmitting } = useVoteSession();
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const hanoukiot = getSortedHanoukiot();
+
+  const handleSubmitAll = async () => {
+    try {
+      await submitAll();
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 5000);
+    } catch (error) {
+      alert('Erreur lors de la soumission des votes');
+    }
+  };
 
   if (loading) {
     return (
@@ -26,11 +38,6 @@ const HanoukiaGallery = () => {
     );
   }
 
-  // Calculate user vote progress
-  const userVotes = voterId
-    ? hanoukiot.filter(h => h.votes.some(v => v.voterId === voterId)).length
-    : 0;
-
   return (
     <div className="hanoukia-gallery">
       <div className="gallery-header">
@@ -39,18 +46,45 @@ const HanoukiaGallery = () => {
           Découvrez les {hanoukiot.length} hanoukiot participantes et notez les !
         </p>
 
-        {voterId && (
-          <div className="voting-progress">
-            <p>
-              Vous avez noté <strong>{userVotes}</strong> sur{' '}
-              <strong>{hanoukiot.length}</strong> hanoukiot
+        <div className="voting-progress">
+          <p>
+            Vous avez noté <strong>{votesCount}</strong> sur{' '}
+            <strong>{hanoukiot.length}</strong> hanoukiot
+          </p>
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{ width: `${(votesCount / hanoukiot.length) * 100}%` }}
+            />
+          </div>
+
+          {votesCount === 0 && (
+            <p className="progress-info">
+              ℹ️ Notez toutes les hanoukiot pour pouvoir soumettre vos votes
             </p>
-            <div className="progress-bar">
-              <div
-                className="progress-fill"
-                style={{ width: `${(userVotes / hanoukiot.length) * 100}%` }}
-              />
-            </div>
+          )}
+
+          {!allVoted && votesCount > 0 && (
+            <p className="progress-hint">
+              ⚠️ Vous devez noter toutes les hanoukiot avant de pouvoir soumettre vos votes
+            </p>
+          )}
+        </div>
+
+        {!showSuccess && (
+          <button
+            className="btn-submit-all"
+            onClick={handleSubmitAll}
+            disabled={!allVoted || isSubmitting}
+          >
+            {isSubmitting ? '⏳ Soumission en cours...' :
+             allVoted ? '✅ Soumettre mes votes' : '🔒 Notez toutes les hanoukiot pour soumettre'}
+          </button>
+        )}
+
+        {showSuccess && (
+          <div className="success-message">
+            ✅ Vos votes ont été enregistrés avec succès !
           </div>
         )}
       </div>
@@ -59,6 +93,26 @@ const HanoukiaGallery = () => {
         {hanoukiot.map(hanoukia => (
           <HanoukiaCard key={hanoukia.id} hanoukia={hanoukia} />
         ))}
+      </div>
+
+      {/* Bouton de soumission en bas de page */}
+      <div className="gallery-footer">
+        {!showSuccess && (
+          <button
+            className="btn-submit-all"
+            onClick={handleSubmitAll}
+            disabled={!allVoted || isSubmitting}
+          >
+            {isSubmitting ? '⏳ Soumission en cours...' :
+             allVoted ? '✅ Soumettre mes votes' : '🔒 Notez toutes les hanoukiot pour soumettre'}
+          </button>
+        )}
+
+        {showSuccess && (
+          <div className="success-message">
+            ✅ Vos votes ont été enregistrés avec succès !
+          </div>
+        )}
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ const useStatistics = () => {
   const [sortBy, setSortBy] = useState('number');
   const [sortOrder, setSortOrder] = useState('asc');
   const [stats, setStats] = useState([]);
+  const [totalVoters, setTotalVoters] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,10 +14,13 @@ const useStatistics = () => {
       setLoading(true);
       try {
         const data = await getStatistics();
-        setStats(data || []);
+        // L'API retourne maintenant { statistics, totalVoters }
+        setStats(data?.statistics || data || []);
+        setTotalVoters(data?.totalVoters || 0);
       } catch (error) {
         console.error('Error loading statistics:', error);
         setStats([]);
+        setTotalVoters(0);
       } finally {
         setLoading(false);
       }
@@ -62,10 +66,13 @@ const useStatistics = () => {
     return sortOrder === 'asc' ? '↑' : '↓';
   };
 
-  const totalVotes = stats.reduce((sum, s) => sum + s.totalVotes, 0);
-  const overallAverage = stats.length > 0
-    ? (stats.reduce((sum, s) => sum + parseFloat(s.averageRating) * s.totalVotes, 0) / totalVotes || 0).toFixed(2)
-    : '0.00';
+  // Trouver la hanoukia en tête (meilleure moyenne)
+  const topHanoukia = useMemo(() => {
+    if (stats.length === 0) return null;
+    return stats.reduce((max, stat) =>
+      parseFloat(stat.averageRating) > parseFloat(max.averageRating) ? stat : max
+    );
+  }, [stats]);
 
   return {
     stats,
@@ -74,8 +81,8 @@ const useStatistics = () => {
     sortBy,
     handleSort,
     getSortIcon,
-    totalVotes,
-    overallAverage,
+    totalVoters,
+    topHanoukia,
   };
 };
 

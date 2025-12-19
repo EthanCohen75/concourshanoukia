@@ -86,16 +86,28 @@ const hanoukiaHelper = {
    */
   calculateStatistics(hanoukia, votes) {
     const hanoukiaVotes = votes.filter(v => v.hanoukiaId === hanoukia.id);
-    const totalVotes = hanoukiaVotes.length;
-    const averageRating = totalVotes > 0
-      ? hanoukiaVotes.reduce((sum, v) => sum + v.rating, 0) / totalVotes
+
+    // Compter les votants uniques (nombre de notations)
+    const uniqueVoters = new Set(hanoukiaVotes.map(v => v.voterId));
+    const totalNotations = uniqueVoters.size;
+
+    const averageRating = totalNotations > 0
+      ? hanoukiaVotes.reduce((sum, v) => sum + v.rating, 0) / totalNotations
       : 0;
+
+    // Préparer la liste des votes individuels pour affichage détaillé
+    const individualVotes = hanoukiaVotes.map((vote, index) => ({
+      voterNumber: index + 1, // Anonymiser: "Votant 1", "Votant 2", etc.
+      rating: vote.rating,
+      timestamp: vote.timestamp
+    }));
 
     return {
       id: hanoukia.id,
       number: hanoukia.number,
-      totalVotes,
-      averageRating: averageRating.toFixed(2)
+      totalNotations, // Nombre de votants uniques
+      averageRating: averageRating.toFixed(2),
+      individualVotes // Liste des votes pour affichage détaillé
     };
   }
 };

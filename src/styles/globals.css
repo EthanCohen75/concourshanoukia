@@ -1619,6 +1619,126 @@ body::before {
   font-style: italic;
 }
 
+/* Carte podium */
+.summary-card-podium {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #1a1a1a;
+  border-color: #ffd700;
+}
+
+.summary-card-podium:hover {
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+}
+
+.summary-card-podium .summary-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.summary-card-podium .summary-value {
+  color: #1a1a1a;
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.summary-card-podium .summary-label {
+  color: #333;
+  font-weight: 600;
+}
+
+/* Lignes cliquables du tableau */
+.stats-table tbody tr.clickable {
+  cursor: pointer;
+}
+
+.stats-table tbody tr.clickable:hover {
+  background-color: rgba(212, 175, 55, 0.1);
+}
+
+.stats-table tbody tr.expanded {
+  background-color: rgba(212, 175, 55, 0.15);
+  cursor: pointer;
+}
+
+/* Détails des votes */
+.details-row {
+  background-color: rgba(212, 175, 55, 0.05);
+}
+
+.details-row td {
+  padding: 0;
+}
+
+.vote-details {
+  padding: 1.5rem;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vote-details h4 {
+  color: var(--gold-bright);
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Tableau de détails */
+.details-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.details-table thead {
+  background: rgba(212, 175, 55, 0.2);
+}
+
+.details-table th {
+  padding: 0.75rem;
+  text-align: left;
+  color: var(--gold-bright);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.details-table td {
+  padding: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--white-soft);
+}
+
+.details-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.details-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.vote-rating-cell {
+  text-align: center;
+}
+
+.rating-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .gallery-header h1 {

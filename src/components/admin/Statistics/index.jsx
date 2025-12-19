@@ -10,8 +10,8 @@ const Statistics = () => {
     sortBy,
     handleSort,
     getSortIcon,
-    totalVotes,
-    overallAverage,
+    totalVoters,
+    topHanoukia,
   } = useStatistics();
 
   if (loading) {
@@ -36,8 +36,8 @@ const Statistics = () => {
 
       <StatsSummary
         stats={stats}
-        totalVotes={totalVotes}
-        overallAverage={overallAverage}
+        totalVoters={totalVoters}
+        topHanoukia={topHanoukia}
       />
 
       <StatsTable
@@ -49,7 +49,7 @@ const Statistics = () => {
 
       <div className="stats-footer">
         <p className="info-text">
-          💡 Cliquez sur les en-têtes de colonne pour trier les résultats
+          💡 Cliquez sur les en-têtes de colonne pour trier | Cliquez sur une ligne pour voir les détails
         </p>
       </div>
     </div>

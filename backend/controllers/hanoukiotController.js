@@ -89,7 +89,14 @@ const hanoukiotController = {
         .map(hanoukia => hanoukiaHelper.calculateStatistics(hanoukia, db.votes))
         .sort((a, b) => a.number - b.number);
 
-      res.json(statistics);
+      // Calculer le nombre total de votants uniques
+      const uniqueVoters = new Set(db.votes.map(v => v.voterId));
+      const totalVoters = uniqueVoters.size;
+
+      res.json({
+        statistics,
+        totalVoters
+      });
     } catch (error) {
       console.error('Error in getStatistics:', error);
       res.status(500).json({ error: 'Erreur lors du calcul des statistiques' });
